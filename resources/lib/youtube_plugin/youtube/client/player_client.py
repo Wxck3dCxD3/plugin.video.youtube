@@ -46,6 +46,10 @@ class YouTubePlayerClient(YouTubeDataClient):
 
     BASE_PATH = make_dirs(TEMP_PATH)
 
+    # A valid YouTube video id. Used to guard values that flow into a
+    # filesystem path so a malformed id cannot escape the temp directory.
+    VIDEO_ID_RE = re_compile(r'^[\w-]{11}$')
+
     FORMAT = {
         # === Non-DASH ===
         '5': {'container': 'flv',
@@ -845,7 +849,11 @@ class YouTubePlayerClient(YouTubeDataClient):
         self._language_prefer_default = prefer_default
 
         self._player_js = None
-        # signatureCipher and nsig handling currently broken and disabled
+        # signatureCipher and nsig handling currently broken and disabled.
+        # While these are False the downstream code paths in
+        # _process_signature_cipher() and _process_url_params() (the
+        # `_calculate_n is True` branch) are intentionally unreachable. Restore
+        # the commented values below to re-enable them.
         # self._calculate_n = True
         # self._cipher = None
         self._calculate_n = False
@@ -1615,7 +1623,11 @@ class YouTubePlayerClient(YouTubeDataClient):
                          ask_for_quality=None,
                          audio_only=None,
                          incognito=None,
-                         use_mpd=None):
+                         use_mpd=None,
+                         break_on_first=False):
+        # NOTE (maintainers): this method is large (~500 lines). The two
+        # natural extraction points if it is revisited are the client-group
+        # retry loop and the metadata/manifest assembly that follows it.
         self.video_id = video_id
 
         if ask_for_quality is None:
@@ -1644,7 +1656,7 @@ class YouTubePlayerClient(YouTubeDataClient):
         context = self._context
         settings = context.get_settings()
         age_gate_enabled = settings.age_gate()
-        use_remote_history = not incognito and settings.use_remote_history()
+        use_remote_history = settings.use_remote_history()
 
         _client_name = None
         _client = None
@@ -1900,7 +1912,12 @@ class YouTubePlayerClient(YouTubeDataClient):
 
                 if (not client_data.get('_auth_required')
                         and video_details.get('isPrivate')):
+                    # A private/members video still owes an authenticated
+                    # re-request, so don't short-circuit even when the caller
+                    # only wants the first usable response.
                     client_data['_auth_required'] = True
+                elif break_on_first:
+                    break
 
         if not responses:
             if _status == 'LIVE_STREAM_OFFLINE':
@@ -2919,6 +2936,13 @@ class YouTubePlayerClient(YouTubeDataClient):
             main_stream['multi_language'] = True
         if roles.difference({'', 'main', 'dub'}):
             main_stream['multi_audio'] = True
+
+        # Guard against a malformed video_id escaping the temp directory when
+        # used as a filename (path-traversal defense-in-depth).
+        if not self.VIDEO_ID_RE.match(self.video_id or ''):
+            self.log.error('Invalid video_id for MPD filename: %r',
+                           self.video_id)
+            return None, None
 
         filename = '.'.join((self.video_id, 'mpd'))
         filepath = os_path.join(self.BASE_PATH, filename)

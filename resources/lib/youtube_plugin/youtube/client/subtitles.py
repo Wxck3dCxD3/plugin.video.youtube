@@ -145,9 +145,8 @@ class Subtitles(YouTubeRequestClient):
         else:
             self.preferred_lang = ('en',)
 
-        self.prompt_override = context.get_ui().pop_property(
-            PLAY_PROMPT_SUBTITLES,
-            as_bool=True,
+        self.prompt_override = bool(
+            context.get_ui().pop_property(PLAY_PROMPT_SUBTITLES)
         )
 
     def load(self, captions, headers=None):

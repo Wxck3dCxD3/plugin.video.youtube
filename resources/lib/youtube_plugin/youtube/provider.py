@@ -1405,18 +1405,26 @@ class Provider(AbstractProvider):
             provider.CACHE_TO_DISC: False,
         }
 
-        # sign in
-        if ((not logged_in or logged_in == 'partially')
-                and settings_bool(settings.SHOW_SIGN_IN, True)):
-            item_label = localize('sign.in')
-            sign_in_item = DirectoryItem(
+        # sign in / sign out (at top of list)
+        # Shows "Sign Out" when logged in (fully or partially), otherwise
+        # "Sign In". Controlled by the single SHOW_SIGN_IN setting.
+        if settings_bool(settings.SHOW_SIGN_IN, True):
+            if logged_in:
+                item_label = localize('sign.out')
+                sign_action = ('sign', 'out')
+                sign_image = '{media}/sign_out.png'
+            else:
+                item_label = localize('sign.in')
+                sign_action = ('sign', 'in')
+                sign_image = '{media}/sign_in.png'
+            sign_item = DirectoryItem(
                 bold(item_label),
-                create_uri(('sign', 'in')),
-                image='{media}/sign_in.png',
+                create_uri(sign_action),
+                image=sign_image,
                 action=True,
                 category_label=item_label,
             )
-            result.append(sign_in_item)
+            result.append(sign_item)
 
         if settings_bool(settings.SHOW_MY_SUBSCRIPTIONS, True):
             # my subscription
@@ -1762,16 +1770,6 @@ class Provider(AbstractProvider):
                 action=True,
             )
             result.append(switch_user_item)
-
-        # sign out
-        if logged_in and settings_bool(settings.SHOW_SIGN_OUT, True):
-            sign_out_item = DirectoryItem(
-                localize('sign.out'),
-                create_uri(('sign', 'out')),
-                image='{media}/sign_out.png',
-                action=True,
-            )
-            result.append(sign_out_item)
 
         if settings_bool(settings.SHOW_SETUP_WIZARD, True):
             settings_menu_item = DirectoryItem(

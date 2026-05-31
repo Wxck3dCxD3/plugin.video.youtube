@@ -33,3 +33,6 @@ append_to_languages.py
 new_strings.txt
 convert_settings.py
 core.po
+
+# Dev-only bug report / patch notes — must not ship in the addon zip
+BUG_REPORT.md

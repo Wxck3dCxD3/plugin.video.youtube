@@ -53,7 +53,13 @@ def resolve(video_id, sort=True, addon_id=None):
             break
 
     if matched_id:
-        streams, _ = client.load_stream_info(video_id=matched_id)
+        streams, _ = client.load_stream_info(video_id=matched_id,
+                                              break_on_first=True)
+        # load_stream_info returns a dict_values view; the public contract of
+        # this resolver is a list of dict, so materialise it for callers that
+        # index or re-iterate the result.
+        if streams is not None:
+            streams = list(streams)
 
     if sort and streams:
         streams = sorted(streams, key=lambda x: x.get('sort', (0, 0)))

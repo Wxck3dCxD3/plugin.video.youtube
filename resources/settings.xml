@@ -582,11 +582,6 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="youtube.folder.sign.out.show" type="boolean" label="30112" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
                 <setting id="youtube.folder.settings.show" type="boolean" label="30526" help="">
                     <level>0</level>
                     <default>true</default>
@@ -685,16 +680,6 @@
                     <dependencies>
                         <dependency type="enable">
                             <condition setting="kodion.support.alternative_player" operator="is">false</condition>
-                        </dependency>
-                    </dependencies>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="kodion.default_player.fallback_video" type="boolean" label="30703" help="">
-                    <level>0</level>
-                    <default>false</default>
-                    <dependencies>
-                        <dependency type="enable">
-                            <condition setting="kodion.default_player.web_urls" operator="is">false</condition>
                         </dependency>
                     </dependencies>
                     <control type="toggle"/>

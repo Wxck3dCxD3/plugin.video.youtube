@@ -1,9 +1,17 @@
-## v7.4.4+beta.1
-### Fixed
-- Limit retrying feeds that cannot be accessed #1425
+## v7.4.3+fork.1
+### Changed
+- Top menu "Sign In" item now switches to "Sign Out" when signed in (fully or partially), controlled by the single Sign In folder setting
+- Remove the separate "Sign Out" folder item and its setting (now handled by the top item)
+- Fetch the auto-play suggested video on a background thread with its own client, so stream setup is not blocked and per-request client state is not shared across threads
+- Reduce internal http server wakeup timeout before resolving streams (5s -> 2s) to improve time-to-first-frame
 
-### New
-- Add option to play YouTube error notification video upon playback failure #1428
+### Fixed
+- Notify the user when no playable stream remains after filtering (e.g. audio-only with no audio stream)
+- Stop iterating client groups once a usable stream is found (break_on_first) for single-quality playback and the public resolver, reducing redundant requests
+- youtube_resolver.resolve() now returns a list as documented, instead of a dict_values view
+
+### Security
+- Validate video id before using it as an MPD filename to prevent path traversal out of the temp directory
 
 ## v7.4.3
 ### Fixed

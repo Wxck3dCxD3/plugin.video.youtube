@@ -70,7 +70,6 @@ SHOW_COMPlETED_LIVE = 'youtube.folder.completed.live.show'  # (bool)
 SHOW_UPCOMING_LIVE = 'youtube.folder.upcoming.live.show'  # (bool)
 SHOW_LIVE = 'youtube.folder.live.show'  # (bool)
 SHOW_SWITCH_USER = 'youtube.folder.switch.user.show'  # (bool)
-SHOW_SIGN_OUT = 'youtube.folder.sign.out.show'  # (bool)
 SHOW_SETUP_WIZARD = 'youtube.folder.settings.show'  # (bool)
 SHOW_SETTINGS = 'youtube.folder.settings.advanced.show'  # (bool)
 
@@ -79,7 +78,6 @@ HISTORY_PLAYLIST = 'youtube.folder.history.playlist'  # (str)
 
 SUPPORT_ALTERNATIVE_PLAYER = 'kodion.support.alternative_player'  # (bool)
 DEFAULT_PLAYER_WEB_URLS = 'kodion.default_player.web_urls'  # (bool)
-DEFAULT_PLAYER_FALLBACK_VIDEO = 'kodion.default_player.fallback_video'  # (bool)
 ALTERNATIVE_PLAYER_WEB_URLS = 'kodion.alternative_player.web_urls'  # (bool)
 ALTERNATIVE_PLAYER_MPD = 'kodion.alternative_player.mpd'  # (bool)
 

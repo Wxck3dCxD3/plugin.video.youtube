@@ -93,6 +93,7 @@ def _do_login(provider, context, client=None, **kwargs):
             break
 
         new_token = ('', expiry_timestamp, '')
+        aborted = False
         try:
             json_data = client.request_device_and_user_code(token_idx)
             if not json_data:
@@ -118,8 +119,13 @@ def _do_login(provider, context, client=None, **kwargs):
                 ui.bold(user_code),
             ))
 
+            system = client._configs.get(token_type, {}).get('system', '')
+            heading = localize('sign.in')
+            if system:
+                heading = '{0} ({1})'.format(heading, system)
+
             with ui.create_progress_dialog(
-                    heading=localize('sign.in'),
+                    heading=heading,
                     message=message,
                     background=False
             ) as progress_dialog:
@@ -155,9 +161,13 @@ def _do_login(provider, context, client=None, **kwargs):
                         break
 
                     if progress_dialog.is_aborted():
+                        aborted = True
                         break
 
                     context.sleep(interval)
+
+            if aborted:
+                break
         except LoginException:
             ui.on_ok(context.get_name(), localize('sign.multi.failed'))
             _do_logout(provider, context, client=client, confirmed=True)
